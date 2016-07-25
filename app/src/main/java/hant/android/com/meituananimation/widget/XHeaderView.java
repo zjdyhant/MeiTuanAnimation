@@ -5,9 +5,9 @@ import android.graphics.drawable.AnimationDrawable;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 
 import hant.android.com.meituananimation.R;
 
@@ -24,6 +24,7 @@ public class XHeaderView extends LinearLayout {
     public final static int STATE_REFRESHING = 2;
 
     private View mContainer;
+    private View container;
     private ImageView mArrowImageView;
 
     private int mState = STATE_NORMAL;
@@ -42,9 +43,21 @@ public class XHeaderView extends LinearLayout {
 
     private void initView(Context context) {
         // Initial set header view height 0
-        RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, 0);
+        /*RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, 0);
         mContainer =  LayoutInflater.from(context).inflate(R.layout.view_listview_header, null);
         addView(mContainer, lp);
+        mArrowImageView = (ImageView) findViewById(R.id.header_arrow);*/
+        final LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, 0);
+        LinearLayout.LayoutParams lp1 = new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        container =  LayoutInflater.from(context).inflate(R.layout.view_listview_header, null);
+        mContainer = container.findViewById(R.id.header_content);
+        mContainer.post(new Runnable() {
+            @Override
+            public void run() {
+                mContainer.setLayoutParams(lp);
+            }
+        });
+        addView(container,lp1);
         mArrowImageView = (ImageView) findViewById(R.id.header_arrow);
     }
 
@@ -94,11 +107,27 @@ public class XHeaderView extends LinearLayout {
      *
      * @param height
      */
-    public void setVisibleHeight(int height) {
+    public void setVisibleHeight(int height ,boolean isRefresh) {
         if (height < 0) height = 0;
-        LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) mContainer.getLayoutParams();
-        lp.height = height;
-        mContainer.setLayoutParams(lp);
+        if(isRefresh){
+            LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) mContainer.getLayoutParams();
+            lp.height = height;
+            lp.width = LayoutParams.MATCH_PARENT;
+            mContainer.setLayoutParams(lp);
+        }else{
+            LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) mContainer.getLayoutParams();
+            lp.topMargin = height-120;
+            mContainer.setLayoutParams(lp);
+            if(height == 0){
+                LinearLayout.LayoutParams lp1 = (LinearLayout.LayoutParams) mContainer.getLayoutParams();
+                lp.height = 0;
+                lp.width = LayoutParams.MATCH_PARENT;
+                lp.topMargin = 0;
+                mContainer.setLayoutParams(lp);
+            }
+        }
+        requestLayout();
+        invalidate();
     }
 
     /**

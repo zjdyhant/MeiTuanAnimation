@@ -4,6 +4,7 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.os.Build;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
@@ -112,6 +113,7 @@ public class XListView extends ListView implements OnScrollListener {
                 @Override
                 public void onGlobalLayout() {
                      mHeaderHeight = mHeaderContent.getHeight();
+                    Log.e("hant", "HeaderHeight   " + mHeaderHeight);
                     ViewTreeObserver observer = getViewTreeObserver();
 
                     if (null != observer) {
@@ -228,7 +230,7 @@ public class XListView extends ListView implements OnScrollListener {
      * Auto call back refresh.
      */
     public void autoRefresh() {
-        mHeader.setVisibleHeight(mHeaderHeight);
+        mHeader.setVisibleHeight(mHeaderHeight,true);
 
         if (mEnablePullRefresh && !mPullRefreshing) {
             // update the arrow image not refreshing
@@ -252,7 +254,7 @@ public class XListView extends ListView implements OnScrollListener {
     }
 
     private void updateHeaderHeight(float delta) {
-        mHeader.setVisibleHeight((int) delta + mHeader.getVisibleHeight());
+        mHeader.setVisibleHeight((int) delta + mHeader.getVisibleHeight(),true);
 
         if (mEnablePullRefresh && !mPullRefreshing) {
             // update the arrow image unrefreshing
@@ -379,7 +381,7 @@ public class XListView extends ListView implements OnScrollListener {
     public void computeScroll() {
         if (mScroller.computeScrollOffset()) {
             if (mScrollBack == SCROLL_BACK_HEADER) {
-                mHeader.setVisibleHeight(mScroller.getCurrY());
+                mHeader.setVisibleHeight(mScroller.getCurrY(),mPullRefreshing);
             } else {
                 mFooterView.setBottomMargin(mScroller.getCurrY());
             }
